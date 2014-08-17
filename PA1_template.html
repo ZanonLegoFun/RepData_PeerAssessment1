@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Reproducible Research: Peer Assessment 1</title>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1>Reproducible Research: Peer Assessment 1</h1>
+
+<h2>Loading and preprocessing the data</h2>
+
+<h3>Loading the dataset in R</h3>
+
+<p>data &lt;- read.csv(&ldquo;activity.csv&rdquo;, 
+                 colClasses = c(&ldquo;numeric&rdquo;, &ldquo;character&rdquo;,&ldquo;numeric&rdquo;))</p>
+
+<h3>Checking the dataset variables</h3>
+
+<p>names(data)
+[1] &ldquo;steps&rdquo;    &ldquo;date&rdquo;     &ldquo;interval&rdquo;</p>
+
+<h3>Checking the dataset head and tail</h3>
+
+<p>head(data)
+tail(data)</p>
+
+<h3>Formatting the date field</h3>
+
+<p>data$date &lt;- as.Date(data$date,&ldquo;%Y-%m-%d&rdquo;)</p>
+
+<h2>What is mean total number of steps taken per day?</h2>
+
+<h3>Getting a summary of the dataset.</h3>
+
+<p>summary(data)</p>
+
+<h3>The summary above excludes the NA???s but the calculated mean of 37.38 steps is the mean at the discrete interval of 5 min and NOT the mean of the total number of steps take per day.</h3>
+
+<h3>Using the aggregate function to create a summary dataset by date and then calculating the means of the total number of steps per day</h3>
+
+<p>data_dailysummary &lt;- aggregate(steps ~ date, data = data, sum, na.rm = TRUE)</p>
+
+<p>mean(data_dailysummary$steps)</p>
+
+<h3>Plotting a histogram to visualize the distribution of the total number of steps per day</h3>
+
+<p>library(lattice)</p>
+
+<p>hist(data_dailysummary$steps, 
+main = &ldquo;Total steps per day&rdquo;, 
+xlab = &ldquo;Steps per Day&rdquo;, 
+ylab=&ldquo;Freq&rdquo;, 
+col = &ldquo;white&rdquo;)</p>
+
+<h2>What is the average daily activity pattern?</h2>
+
+<h3>Making a time series plot (i.e. type = ???l???) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)</h3>
+
+<h3>Getting the mean of steps and time series data</h3>
+
+<p>time_series_data &lt;- tapply(data$steps, data$interval, mean, na.rm = TRUE)</p>
+
+<h3>Plotting the mean of steps using the time series data</h3>
+
+<p>plot(row.names(time_series_data), time_series_data, 
+type = &ldquo;l&rdquo;, 
+xlab = &ldquo;5-min interval&rdquo;, 
+ylab = &ldquo;Average Steps per 5-min interval&rdquo;, 
+main = &ldquo;Time Series of the Average number of steps taken&rdquo;, 
+col = &ldquo;blue&rdquo;)</p>
+
+<h3>Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?</h3>
+
+<p>max_steps_interval &lt;- which.max(time_series_data)</p>
+
+<h3>then identifying the 5-minute interval of max_steps_interval</h3>
+
+<p>names(max_steps_interval)</p>
+
+<h2>Imputing missing values</h2>
+
+<h3>Calculate and report the total number of missing values in the dataset</h3>
+
+<p>summary(data$steps)</p>
+
+<h3>Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval,etc</h3>
+
+<h3>Using the approach to calculate the mean of the number of steps by 5-min interval</h3>
+
+<p>StepsAverageByInterval &lt;- aggregate(steps ~ interval, data = data, FUN = mean)</p>
+
+<h3>Then creating a function to fill the average of steps at the intervals with value NA of the dataset with all observations</h3>
+
+<p>NAFilling &lt;- numeric()
+for (i in 1:nrow(data)) {
+          xi &lt;- data[i, ]
+          if (is.na(xi$steps)) {
+                    steps &lt;- subset(StepsAverageByInterval, interval == xi$interval)$steps
+          } else {
+                    steps &lt;- xi$steps
+          }
+          NAFilling &lt;- c(NAFilling, steps)
+}</p>
+
+<h3>And creating a new dataset that is equal to the original dataset but with the missing data filled in using the mean of the number of steps at the respective 5-min interval. By applying the summary function validates that there are no NAs and the length</h3>
+
+<p>data_NAfilled &lt;- data</p>
+
+<p>data_NAfilled$steps &lt;- NAFilling</p>
+
+<p>summary(data_NAfilled$steps)</p>
+
+<h3>Both datasets have the same dimensions</h3>
+
+<p>dim(data)</p>
+
+<p>dim(data_NAfilled)</p>
+
+<h3>Making a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?</h3>
+
+<p>TotalSteps &lt;- aggregate(steps ~ date, data = data_NAfilled, sum, na.rm = TRUE)</p>
+
+<p>hist(TotalSteps$steps, main = &ldquo;Daily Total Steps&rdquo;, xlab = &ldquo;Steps per Day&rdquo;, col = &ldquo;white&rdquo;)</p>
+
+<h3>Calculating the mean and median of the steps we conclude:</h3>
+
+<h3>(1) The mean is the same due to the fact that we filled the NAs with the mean (no impact on the mean calculation)</h3>
+
+<p>mean(TotalSteps$steps)</p>
+
+<h3>(2) However the median is different in comparison to the original one and now it is equal to the mean.</h3>
+
+<p>median(TotalSteps$steps)</p>
+
+<h2>Are there differences in activity patterns between weekdays and weekends?</h2>
+
+<h3>For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.</h3>
+
+<h3>Creating a new factor variable in the dataset with two levels: weekday and weekend indicating whether a given date is a weekday or weekend day.</h3>
+
+<p>DayType &lt;- weekdays(data$date)
+WeekDay &lt;- vector()
+for (i in 1:nrow(data)) {
+          if (DayType[i] == &ldquo;Saturday&rdquo;) {
+                    WeekDay[i] &lt;- &ldquo;Weekend&rdquo;
+          } else if (DayType[i] == &ldquo;Sunday&rdquo;) {
+                    WeekDay[i] &lt;- &ldquo;Weekend&rdquo;
+          } else {
+                    WeekDay[i] &lt;- &ldquo;Weekday&rdquo;
+          }
+}
+data$WeekDay &lt;- WeekDay
+data$WeekDay &lt;- factor(data$WeekDay)
+DailySteps &lt;- aggregate(steps ~ interval + WeekDay, data = data, mean)</p>
+
+<p>names(DailySteps) &lt;- c(&ldquo;interval&rdquo;, &ldquo;WeekDay&rdquo;, &ldquo;steps&rdquo;)</p>
+
+<h3>Make a panel plot containing a time series plot (i.e. type = ???l???) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).</h3>
+
+<p>xyplot(steps ~ interval | WeekDay, DailySteps, type = &ldquo;l&rdquo;, layout = c(1, 2), 
+       panel = lattice.getOption(&ldquo;panel.xyplot&rdquo;),
+       xlab = &ldquo;Interval&rdquo;, 
+       ylab = &ldquo;Number of steps&rdquo;,
+)</p>
+
+<h4>Notes: It looks like this individual practices some activity during the morning due to spike during the weekdays (Monday Thru Friday) and have weekends with activity spread during the day.</h4>
+
+</body>
+
+</html>
